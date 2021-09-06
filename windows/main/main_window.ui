@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
+    <item>
+     <widget class="QTreeView" name="uiCompView"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="uiMenu">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="uiMenuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="uiActNew"/>
+    <addaction name="uiActOpen"/>
+    <addaction name="uiActSave"/>
+    <addaction name="uiActSave_As"/>
+   </widget>
+   <widget class="QMenu" name="uiMenuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="uiActAddNode"/>
+    <addaction name="uiActRemoveNode"/>
+   </widget>
+   <widget class="QMenu" name="uiMenuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="uiActExpand"/>
+    <addaction name="uiActCollapse"/>
+   </widget>
+   <widget class="QMenu" name="uiMenuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="uiActOpenSettingsWindow"/>
+   </widget>
+   <addaction name="uiMenuFile"/>
+   <addaction name="uiMenuEdit"/>
+   <addaction name="uiMenuView"/>
+   <addaction name="uiMenuSettings"/>
+  </widget>
+  <action name="uiActNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="uiActOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="uiActSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="uiActSave_As">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="uiActAddNode">
+   <property name="text">
+    <string>Add Node</string>
+   </property>
+  </action>
+  <action name="uiActRemoveNode">
+   <property name="text">
+    <string>Remove Node</string>
+   </property>
+  </action>
+  <action name="uiActExpand">
+   <property name="text">
+    <string>Expand</string>
+   </property>
+  </action>
+  <action name="uiActCollapse">
+   <property name="text">
+    <string>Collapse</string>
+   </property>
+  </action>
+  <action name="uiActOpenSettingsWindow">
+   <property name="text">
+    <string>Open Settings Window</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
