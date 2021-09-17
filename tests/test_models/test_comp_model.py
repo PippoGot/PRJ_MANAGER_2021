@@ -1,40 +1,82 @@
-from hypothesis import given, settings, assume, strategies as st
-from hypothesis import reproduce_failure, note
+# libraries
+from hypothesis.stateful import RuleBasedStateMachine, rule, invariant, Bundle, consumes, initialize
+from hypothesis import strategies as st, settings, Verbosity
+from unittest import TestCase
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
-
-from core.nodes.nodes import Component
+# custom modules
+from core.components.components import Component
 from models.comp_model import CompModel
+from ..test_core.test_components import component_st
 
-# settings(max_examples = 20)
+# don't need to test
+# - column count
+# - header data
 
-test_comp_model = CompModel()
+class CompModelTest(RuleBasedStateMachine):
 
-root = Component(name='root', desc='no description')
-first = Component(name='Project', desc='Top level node, describe the project here!')
-root.add_child(first)
+    def __init__(self):
+        super().__init__()
+        self.model = CompModel()
 
-root_name == getattr(root, "name")
-root_desc == getattr(root, "desc")
-first_name == getattr(first, "name")
-first_desc == getattr(first, "desc")
+        self.components = [
+                self.model.root,
+                self.model.first
+            ]
 
-root_index_name = test_comp_model.createIndex(0, 0, None)
-first_index_name = test_comp_model.createIndex(0, 0, root_index_name)
-root_index_desc = test_comp_model.createIndex(0, 1, None)
-first_index_desc = test_comp_model.createIndex(0, 1, root_index_name)
+    def _create_index(self, item):
+        """Generates the model index of a given component."""
 
-def test_comp_model_creation():
+        row = item.get_index()
+        return self.model.createIndex(row, 0, item)
 
-    assert test_comp_model.root == root
+    @rule(item = component_st(), data = st.data())
+    def add_component_to_model(self, item, data):
+        """Adds a component to the model."""
 
-def test_comp_model_data():
+        parent_item = data.draw(st.sampled_from(self.components))
+        parent_index = self._create_index(parent_item)
+        self.model.insertRows(item, parent_index)
 
-    assert test_comp_model.data(root_index_name, qtc.Qt.DisplayRole) == root_name
-    assert test_comp_model.data(root_index_desc, qtc.Qt.DisplayRole) == root_desc
-    assert test_comp_model.data(first_index_name, qtc.Qt.DisplayRole) == first_name
-    assert test_comp_model.data(first_index_desc, qtc.Qt.DisplayRole) == first_desc
+        position = len(parent_item) - 1
+        child_item = parent_item.get_child_at(position)
 
-# def test_comp_model_index():
+        assert child_item == item
+        self.components.append(item)
 
-#     assert root_index ==
+    @rule(data = st.data())
+    def remove_component_from_model(self, data):
+        """Removes a component from the model."""
+
+        parent_item = data.draw(st.sampled_from(self.components))
+        if parent_item.is_empty(): return
+
+        parent_index = self._create_index(parent_item)
+        position = data.draw(st.integers(min_value = 0, max_value = len(parent_item) - 1))
+        child_item = parent_item.get_child_at(position)
+
+        self.model.removeRows(position, parent_index)
+        self.components = self.model.root.get_subtree_components()
+
+    @invariant()
+    def check_components(self):
+        """
+        After every step checks that the list of components contains all of the elements
+        in the model.
+        """
+
+        components_list = self.model.root.get_subtree_components()
+
+        for component in self.components:
+            component_index = self._create_index(component)
+            parent_index = self.model.parent(component_index)
+            parent_item = parent_index.internalPointer()
+
+            assert parent_item == component.get_parent()
+            assert component in components_list
+
+        assert len(components_list) == len(self.components)
+
+# --- TEST EXECUTION ---
+
+Test = CompModelTest.TestCase

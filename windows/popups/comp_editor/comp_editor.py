@@ -1,24 +1,20 @@
+# libraries
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
-
+# custom modules
 from .ui_comp_editor import  Ui_comp_editor as ui
 
 class CompEditor(qtw.QWidget, ui):
     """
-    Popup window to edit a node before adding it to the component tree.
-    Provides all the necessary widgets to edit a component node.
+    Popup window to edit a component before adding it to the model.
+    Provides all the necessary widgets to edit a component.
     """
 
-    submit = qtc.pyqtSignal(object)
+    submit = qtc.pyqtSignal(object) # emits all the data
 
     def __init__(self):
-        """
-        Loads the UI window and connects the buttons signals to the proper slots.
-
-        Args:
-            node (ComponentNode): the node to edit in this window
-        """
+        """Loads the UI window, connects signals to slots and show itself."""
 
         super(CompEditor, self).__init__()
         self.setupUi(self)
@@ -29,9 +25,7 @@ class CompEditor(qtw.QWidget, ui):
         self.show()
 
     def submit_data(self):
-        """
-        Emits the data inserted in the editor.
-        """
+        """Emits the data inserted in the editor, then closes the popup."""
 
         data = [
             self.uiLEName.text(),

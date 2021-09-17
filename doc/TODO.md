@@ -15,3 +15,20 @@ for example the idea of RootNode, HardwareNode etc...
 
 4 - add a label to define the level of a node (now a component)
 create a standalone class for the ID number (examples #000-001, #MEH-001 etc...)
+
+---
+
+add tests for:
+
+- add strategy to create component trees
+
+recomment and docstring:
+
+- components
+- comp_model
+- all tests
+
+refactoring:
+
+- try to simplify CompModel.removeRows function
+- rename Component.get_index to Component.get_row

@@ -1,12 +1,11 @@
+# libraries
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
-
-from core.nodes.nodes import Component
+# custom modules
+from core.components.components import Component
 
 class CompModel(qtc.QAbstractItemModel):
-    """
-    This class manages the model storing the data for every project.
-    """
+    """This class manages the model storing the data for every project."""
 
     HEADERS = [
     #     'ID',
@@ -26,11 +25,9 @@ class CompModel(qtc.QAbstractItemModel):
     def __init__(self, root = None):
         """
         Initialise the object parameters.
-        If a filename is passed, the file is read and the data structure inside
-        that file is extracted. If nothing is passed, creates a new root.
 
         Args:
-            filename (str): name or path of the file to read. Default is None.
+            root (Component): the root component of this model. Default is None.
         """
 
         super(CompModel, self).__init__()
@@ -43,7 +40,7 @@ class CompModel(qtc.QAbstractItemModel):
         self.first = Component(name='Project', desc='Top level node, describe the project here!')
         self.root.add_child(self.first)
 
-# --- MODEL FUNCTIONS ---
+# --- MODEL FUNCTIONS OVERWRITING ---
 
     def data(self, index, role):
         """
@@ -143,14 +140,14 @@ class CompModel(qtc.QAbstractItemModel):
         if not self.hasIndex(row, column, parent):
             return qtc.QModelIndex()
         elif not parent.isValid():
-            parentItem = self.root
+            parent_item = self.root
         else:
-            parentItem = parent.internalPointer()
+            parent_item = parent.internalPointer()
 
-        childItem = parentItem.get_child_at(row)
+        child_item = parent_item.get_child_at(row)
 
-        if childItem:
-            return self.createIndex(row, column, childItem)
+        if child_item:
+            return self.createIndex(row, column, child_item)
 
         return qtc.QModelIndex()
 
@@ -175,14 +172,14 @@ class CompModel(qtc.QAbstractItemModel):
         if not index.isValid():
             return qtc.QModelIndex()
 
-        childItem = index.internalPointer()
-        parentItem = childItem.get_parent()
+        child_item = index.internalPointer()
+        parent_item = child_item.get_parent()
 
-        if parentItem == self.root:
+        if not parent_item:
             return qtc.QModelIndex()
 
-        row = parentItem.get_index()
-        return self.createIndex(row, 0, parentItem)
+        row = parent_item.get_index()
+        return self.createIndex(row, 0, parent_item)
 
     def rowCount(self, parent):
         """
@@ -200,11 +197,11 @@ class CompModel(qtc.QAbstractItemModel):
             return 0
 
         if not parent.isValid():
-            parentItem = self.root
+            parent_item = self.root
         else:
-            parentItem = parent.internalPointer()
+            parent_item = parent.internalPointer()
 
-        return len(parentItem)
+        return len(parent_item)
 
     def columnCount(self, parent):
         """
@@ -220,7 +217,7 @@ class CompModel(qtc.QAbstractItemModel):
 
         return len(self.HEADERS)
 
-    def insertRows(self, position, item, parent = qtc.QModelIndex()):
+    def insertRows(self, item, parent_index = qtc.QModelIndex()):
         """
         Insert a node row in the specified position.
 
@@ -233,38 +230,40 @@ class CompModel(qtc.QAbstractItemModel):
             bool: the success of the operation
         """
 
-        if parent.isValid():
-            parentItem = parent.internalPointer()
+        if parent_index.isValid():
+            parent_item = parent_index.internalPointer()
         else:
-            parentItem = self.first
+            parent_item = self.first
 
-        self.beginInsertRows(parent.siblingAtColumn(0), position, position)
-        success = parentItem.add_child(item)
+        position = len(parent_item)
+
+        self.beginInsertRows(parent_index.siblingAtColumn(0), position, position)
+        success = parent_item.add_child(item)
         self.endInsertRows()
 
         return success
 
-    def removeRows(self, position, parent = qtc.QModelIndex()):
+    def removeRows(self, position, parent_index = qtc.QModelIndex()):
         """
         Remove the row in the specified position.
 
         Args:
             position (int): the index of the node to remove.
-            parent (QModelIndex): the index of the parent item.
+            parent_index (QModelIndex): the index of the parent item.
 
         Returns:
             bool: the success of the operation.
         """
 
-        if parent.isValid():
-            parentItem = parent.internalPointer()
+        if parent_index.isValid():
+            parent_item = parent_index.internalPointer()
         else:
-            parentItem = self.first
+            parent_item = self.root
 
-        self.beginRemoveRows(parent.siblingAtColumn(0), position, position)
+        self.beginRemoveRows(parent_index.siblingAtColumn(0), position, position)
 
-        childItem = parentItem.get_child_at(position)
-        success = parentItem.remove_child(childItem)
+        child_item = parent_item.get_child_at(position)
+        success = parent_item.remove_child(child_item)
 
         self.endRemoveRows()
 

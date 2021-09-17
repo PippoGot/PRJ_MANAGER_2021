@@ -40,3 +40,7 @@ models/__pycache__/
 tests/test_models/__init__.py
 
 tests/test_models/__pycache__/
+
+__pycache__/
+
+core/components/__init__.py
