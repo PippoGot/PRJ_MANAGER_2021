@@ -1,16 +1,19 @@
-# libraries
+# --- LIBRARIES ---
 from PyQt5 import QtCore as qtc
-from PyQt5 import QtGui as qtg
-# custom modules
+from typing import Any, Optional
+# --- CUSTOM MODULES ---
 from core.components.components import Component
 
 class CompModel(qtc.QAbstractItemModel):
-    """This class manages the model storing the data for every project."""
+    """
+    This class manages the model storing the main data structure
+    of an assembly project.
+    """
 
     HEADERS = [
     #     'ID',
         'name',
-        'desc'#,
+        'desc',
     #     'type',
     #     'manufacture',
     #     'status',
@@ -22,7 +25,7 @@ class CompModel(qtc.QAbstractItemModel):
     #     'link',
     ]
 
-    def __init__(self, root = None):
+    def __init__(self, root: Optional[Component] = None) -> None:
         """
         Initialise the object parameters.
 
@@ -46,13 +49,6 @@ class CompModel(qtc.QAbstractItemModel):
         """
         Returns the data stored under the given role for the item referred to
         by the index.
-
-        Args:
-            index (QModelIndex): the index of the item currently examined.
-            role (int): the enum to apply to the item.
-
-        Returns:
-            PyObject: the object to display or the thing to do.
         """
 
         if not index.isValid():
@@ -67,14 +63,6 @@ class CompModel(qtc.QAbstractItemModel):
     def setData(self, index, value, role = qtc.Qt.EditRole):
         """
         Used to edit and update the model items values.
-
-        Args:
-            index (QModelIndex): the index of the edited item.
-            value (PyObject): the new field value.
-            role (int): the action currently performed to the item. Default is EditRole.
-
-        Returns:
-            bool: the success of the operation.
         """
 
         if index.isValid() and role == qtc.Qt.EditRole:
@@ -90,12 +78,6 @@ class CompModel(qtc.QAbstractItemModel):
         what can be done with the model items.
         Numbers, types and some manufactures of the items are non-editable fields,
         the other fields are editable.
-
-        Args:
-            index – QModelIndex
-
-        Returns:
-            ItemFlags
         """
 
         if not index.isValid():
@@ -108,14 +90,6 @@ class CompModel(qtc.QAbstractItemModel):
         For horizontal headers, the section number corresponds to the column number. Similarly, for
         vertical headers, the section number corresponds to the row number.
         The headers are taken from a list of string values.
-
-        Args:
-            section (int): the current column.
-            orientation (Orientation): horizontal or vertical.
-            role (int): the action currently performed.
-
-        Returns:
-            PyObject: the object to display or the action to perform.
         """
 
         if orientation == qtc.Qt.Horizontal and role == qtc.Qt.DisplayRole:
@@ -127,14 +101,6 @@ class CompModel(qtc.QAbstractItemModel):
         Returns the index of the item in the model specified by the given row, column and parent index.
         When reimplementing this function in a subclass, call createIndex() to generate model indexes
         that other components can use to refer to items in your model.
-
-        Args:
-            row (int): the item row.
-            column (int): the item column.
-            parent (QModelIndex): the item parent index.
-
-        Returns:
-            QModelIndex: the new index created.
         """
 
         if not self.hasIndex(row, column, parent):
@@ -161,12 +127,6 @@ class CompModel(qtc.QAbstractItemModel):
         When reimplementing this function in a subclass, be careful to avoid calling QModelIndex member
         functions, such as parent(), since indexes belonging to your model will simply call your implementation,
         leading to infinite recursion.
-
-        Args:
-            index (QModelIndex): the index of the child item.
-
-        Returns:
-            QModelIndex: the index of the parent node for the given item.
         """
 
         if not index.isValid():
@@ -185,12 +145,6 @@ class CompModel(qtc.QAbstractItemModel):
         """
         Returns the number of rows under the given parent. When the parent is valid it means
         that is returning the number of children of parent.
-
-        Args:
-            parent (QModelIndex): the index of the current item.
-
-        Returns:
-            int: the number of children of the current item.
         """
 
         if parent.column() > 0:
@@ -207,12 +161,6 @@ class CompModel(qtc.QAbstractItemModel):
         """
         Returns the number of columns for the children of the given parent.
         In most subclasses, the number of columns is independent of the parent.
-
-        Args:
-            parent (QModelIndex): the currently examined item.
-
-        Returns:
-            int: the number of columns of this item.
         """
 
         return len(self.HEADERS)
@@ -220,14 +168,6 @@ class CompModel(qtc.QAbstractItemModel):
     def insertRows(self, item, parent_index = qtc.QModelIndex()):
         """
         Insert a node row in the specified position.
-
-        Args:
-            position (int): the index where the item will be added
-            item (ComponentNode): the node to add to the model
-            parent (QModelIndex): the index of the parent item. Default is an invalid index
-
-        Returns:
-            bool: the success of the operation
         """
 
         if parent_index.isValid():
@@ -246,13 +186,6 @@ class CompModel(qtc.QAbstractItemModel):
     def removeRows(self, position, parent_index = qtc.QModelIndex()):
         """
         Remove the row in the specified position.
-
-        Args:
-            position (int): the index of the node to remove.
-            parent_index (QModelIndex): the index of the parent item.
-
-        Returns:
-            bool: the success of the operation.
         """
 
         if parent_index.isValid():

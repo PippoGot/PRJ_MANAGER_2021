@@ -1,4 +1,4 @@
-- for imports use # libraries and # custom modules
+- for imports use # --- LIBRARIES --- and # --- CUSTOM MODULES ---
 - snake notation for files, methods and variables names when possible
 - camel notation for classes
 - Args:

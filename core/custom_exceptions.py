@@ -1,21 +1,26 @@
-# used in nodes.py
+# --- LIBRARIES ---
+from typing import Any
 
+# --- USED IN COMPONENTS ---
 class InvalidChildIndexError(Exception):
     """
     Reports that a passed index is out of bound for the extraction
-    of the children from a node.
+    of the children from a component.
     """
 
-    def __init__(self, position):
+    def __init__(self, position: int) -> None:
         self.position = position
         self.message = f'{type(self).__name__}: position {self.position} out of bound'
 
         super().__init__(self.message)
 
 class InvalidChildError(Exception):
-    """Reports that the passed component is not in the current component children list."""
+    """
+    Reports that the passed component is not in the current
+    component children list.
+    """
 
-    def __init__(self, child_component):
+    def __init__(self, child_component) -> None:
         self.component = child_component
         self.message = f'{type(self).__name__}: "{self.component}" is not in the children list'
 
@@ -24,7 +29,7 @@ class InvalidChildError(Exception):
 class InvalidComponentError(Exception):
     """Reports that the passed argument is not an instance of Component."""
 
-    def __init__(self, obj):
+    def __init__(self, obj: Any) -> None:
         self.object = obj
         self.message = f'{type(self).__name__}: "{self.object}" is not an instance of Component class'
 
@@ -33,7 +38,7 @@ class InvalidComponentError(Exception):
 class EmptyComponentError(Exception):
     """Reports that the component has no children while trying to access them."""
 
-    def __init__(self, component):
+    def __init__(self, component) -> None:
         self.component = component
         self.message = f'{type(self).__name__}: "{self.component}" is empty'
 

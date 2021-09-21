@@ -1,10 +1,9 @@
-# libraries
+# --- LIBRARIES ---
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 import os
-
-#custom modules
+# --- CUSTOM MODULES ---
 # popups
 from ..popups.comp_editor.comp_editor import CompEditor
 # core
