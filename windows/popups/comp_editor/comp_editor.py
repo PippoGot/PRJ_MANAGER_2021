@@ -20,17 +20,17 @@ class CompEditor(qtw.QWidget, ui):
         self.setupUi(self)
 
         self.uiBtnCancel.clicked.connect(self.close)
-        self.uiBtnOk.clicked.connect(self.submit_data)
+        self.uiBtnOk.clicked.connect(self._submit_data)
 
         self.show()
 
-    def submit_data(self):
+    def _submit_data(self):
         """Emits the data inserted in the editor, then closes the popup."""
 
-        data = [
-            self.uiLEName.text(),
-            self.uiTEDesc.toPlainText()
-        ]
+        data = {
+            'name': self.uiLEName.text(),
+            'desc': self.uiTEDesc.toPlainText()
+        }
 
         self.submit.emit(data)
         self.close()

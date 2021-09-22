@@ -1,6 +1,6 @@
 # --- LIBRARIES ---
-from hypothesis.stateful import RuleBasedStateMachine, rule, invariant, Bundle, consumes, initialize
-from hypothesis import strategies as st, settings, Verbosity
+from hypothesis.stateful import RuleBasedStateMachine, rule, invariant
+from hypothesis import strategies as st
 from unittest import TestCase
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
@@ -22,53 +22,51 @@ class CompModelTest(RuleBasedStateMachine):
         super().__init__()
         self.model = CompModel()
 
-        self.components = [
-                self.model.root,
-                self.model.first
-            ]
+        self._update_components()
 
-    def _create_index(self, item):
+    def _create_index(self, component: Component) -> qtc.QModelIndex:
         """Generates the model index of a given component."""
 
-        row = item.get_index()
-        return self.model.createIndex(row, 0, item)
+        row = component.get_row()
+        return self.model.createIndex(row, 0, component)
 
-    @rule(item = component_st(), data = st.data())
-    def add_component_to_model(self, item, data):
+    def _update_components(self) -> None:
+        """Updates the content of the components list."""
+
+        self.components = self.model.get_components_list()
+
+    #TODO change asdict
+    @rule(component = component_st(), data = st.data())
+    def add_component_to_model(self, component, data):
         """Adds a component to the model."""
 
-        # gets a component from the added ones
-        parent_item = data.draw(st.sampled_from(self.components))
-        # creates the proper index
-        parent_index = self._create_index(parent_item)
-        # and adds it to the model
-        self.model.insertRows(item, parent_index)
+        parent_component = data.draw(st.sampled_from(self.components))
+        parent_index = self._create_index(parent_component)
+        data_dict = component.as_dict()
 
-        # then checks if the added item is inside the data structure
-        position = len(parent_item) - 1
-        child_item = parent_item.get_child_at(position)
-        assert child_item == item
+        self.model.insertRows(data_dict, parent_index)
 
-        # and adds the item to the list of components to use it as random data
-        self.components.append(item)
+        position = len(parent_component) - 1
+        child_component = parent_component.get_child_at(position)
+        assert child_component == component
+
+        self._update_components()
 
     @rule(data = st.data())
     def remove_component_from_model(self, data):
         """Removes a component from the model."""
 
-        # gets a component from the added ones
-        parent_item = data.draw(st.sampled_from(self.components))
-        # if the component is empty returns because there is nothing to remove
-        if parent_item.is_empty(): return
+        parent_component = data.draw(st.sampled_from(self.components))
 
-        # creates the index of the selected parent and generates a random position
-        parent_index = self._create_index(parent_item)
-        position = data.draw(st.integers(min_value = 0, max_value = len(parent_item) - 1))
-        child_item = parent_item.get_child_at(position)
+        if parent_component.is_empty(): return
 
-        # finally removes the generated row and updates the component list
-        self.model.removeRows(position, parent_index)
-        self.components = self.model.root.get_subtree_components()
+        position = data.draw(st.integers(min_value = 0, max_value = len(parent_component) - 1))
+        component = parent_component.get_child_at(position)
+        component_index = self._create_index(component)
+
+        self.model.removeRows(component_index)
+
+        self._update_components()
 
     @invariant()
     def check_components(self):
@@ -77,20 +75,14 @@ class CompModelTest(RuleBasedStateMachine):
         in the model.
         """
 
-        # gets the list of components
-        components_list = self.model.root.get_subtree_components()
+        components_list = self.model.get_components_list()
 
-        # for every one of them
         for component in self.components:
-            # the index is generated
             component_index = self._create_index(component)
-            # the parent index is extracted
             parent_index = self.model.parent(component_index)
-            # as well as the parent item
-            parent_item = parent_index.internalPointer()
+            parent_component = parent_index.internalPointer()
 
-            # then the parent is checked with the original component's parent
-            assert parent_item == component.get_parent()
+            assert parent_component == component.get_parent()
             assert component in components_list
 
         assert len(components_list) == len(self.components)
