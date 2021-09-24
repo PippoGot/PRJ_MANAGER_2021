@@ -3,8 +3,8 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 # --- CUSTOM MODULES ---
-# popups
-from ..popups.comp_editor.comp_editor import CompEditor
+# widgets
+from ..pages.comp_page.comp_page import CompPage
 # models
 from models.comp_model import CompModel
 # UI
@@ -22,39 +22,27 @@ class MainWindow(qtw.QMainWindow, ui):
         self.application = application
 
     # model creation
+        self._generate_models()
+
+    # page creation
+        self._generate_pages()
+
+    def _generate_models(self):
+        """Generates all of the needed models."""
+
         self.comp_model = CompModel()
-        self.comp_index = None
-        self.uiCompView.setModel(self.comp_model)
-        self.comp_selection = self.uiCompView.selectionModel()
-        self.comp_selection.currentChanged.connect(self._update_current_index)
 
-    # edit menu action connection
-        self.uiActAddNode.triggered.connect(self.open_editor)
-        self.uiActRemoveNode.triggered.connect(self.remove_node)
+    def _generate_pages(self):
+        """Generates the pages and adds them to the layout."""
 
-    def open_editor(self):
-        """Opens an editor popup to input the component data."""
+        self.comp_page = CompPage(self.comp_model)
+        self.uiCompPageFrame.layout().addWidget(self.comp_page)
+        comp_page_action_list = self.comp_page.get_actions()
 
-        self.comp_index = self.comp_selection.currentIndex()
-        if not self.comp_index.isValid(): return
+        self._add_actions(comp_page_action_list)
 
-        self.comp_editor = CompEditor()
-        self.comp_editor.submit.connect(self.add_node)
+    def _add_actions(self, actions_list):
+        """Extract and adds the actions from the pages to the menus."""
 
-    def add_node(self, data):
-        """Adds the passed data to the model."""
-
-        current_comp = self.comp_index.internalPointer()
-        self.comp_model.insertRows(data, self.comp_index)
-
-    def remove_node(self):
-        """Removes the currently selected index from the model."""
-
-        if not self.comp_index.isValid(): return
-
-        self.comp_model.removeRows(self.comp_index)
-
-    def _update_current_index(self):
-        """Updates the current selected index."""
-
-        self.comp_index = self.comp_selection.currentIndex()
+        for action in actions_list:
+            self.uiMenuEdit.addAction(action)

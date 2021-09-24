@@ -3,9 +3,9 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 # custom modules
-from .ui_comp_editor import  Ui_comp_editor as ui
+from .ui_popup_editor import  Ui_popup_editor as ui
 
-class CompEditor(qtw.QWidget, ui):
+class PopupEditor(qtw.QWidget, ui):
     """
     Popup window to edit a component before adding it to the model.
     Provides all the necessary widgets to edit a component.
@@ -16,7 +16,7 @@ class CompEditor(qtw.QWidget, ui):
     def __init__(self):
         """Loads the UI window, connects signals to slots and show itself."""
 
-        super(CompEditor, self).__init__()
+        super(PopupEditor, self).__init__()
         self.setupUi(self)
 
         self.uiBtnCancel.clicked.connect(self.close)

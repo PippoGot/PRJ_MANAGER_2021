@@ -16,6 +16,14 @@ class CompModel(qtc.QAbstractItemModel):
 
         super(CompModel, self).__init__()
 
+        self._init_base_components(root)
+        self._retrieve_headers()
+
+# --- INIT CUSTOM FUNCTIONS ---
+
+    def _init_base_components(self, root: Optional[Component]) -> None:
+        """Generates the initial components of the model."""
+
         if root:
             self.root = root
         else:
@@ -23,6 +31,9 @@ class CompModel(qtc.QAbstractItemModel):
 
         self.first = Component(name='Project', desc='Top level node, describe the project here!')
         self.root.add_child(self.first)
+
+    def _retrieve_headers(self) -> None:
+        """Extracts the headers from the root component after it is created."""
 
         self.HEADERS = self.root.get_fields_tuple()
 

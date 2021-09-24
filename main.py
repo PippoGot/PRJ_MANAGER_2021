@@ -2,7 +2,6 @@
 from PyQt5 import QtWidgets as qtw
 import sys
 # --- CUSTOM MODULES ---
-# ui
 from windows.main.main_window import MainWindow
 
 def main():

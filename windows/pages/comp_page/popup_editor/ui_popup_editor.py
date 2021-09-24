@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\comp_editor.ui'
+# Form implementation generated from reading ui file '.\popup_editor.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -11,33 +11,33 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_comp_editor(object):
-    def setupUi(self, comp_editor):
-        comp_editor.setObjectName("comp_editor")
-        comp_editor.resize(400, 300)
-        self.verticalLayout = QtWidgets.QVBoxLayout(comp_editor)
+class Ui_popup_editor(object):
+    def setupUi(self, popup_editor):
+        popup_editor.setObjectName("popup_editor")
+        popup_editor.resize(400, 300)
+        self.verticalLayout = QtWidgets.QVBoxLayout(popup_editor)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.uiLEName = QtWidgets.QLineEdit(comp_editor)
+        self.uiLEName = QtWidgets.QLineEdit(popup_editor)
         self.uiLEName.setObjectName("uiLEName")
         self.verticalLayout.addWidget(self.uiLEName)
-        self.uiTEDesc = QtWidgets.QTextEdit(comp_editor)
+        self.uiTEDesc = QtWidgets.QTextEdit(popup_editor)
         self.uiTEDesc.setObjectName("uiTEDesc")
         self.verticalLayout.addWidget(self.uiTEDesc)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.uiBtnOk = QtWidgets.QPushButton(comp_editor)
+        self.uiBtnOk = QtWidgets.QPushButton(popup_editor)
         self.uiBtnOk.setObjectName("uiBtnOk")
         self.horizontalLayout.addWidget(self.uiBtnOk)
-        self.uiBtnCancel = QtWidgets.QPushButton(comp_editor)
+        self.uiBtnCancel = QtWidgets.QPushButton(popup_editor)
         self.uiBtnCancel.setObjectName("uiBtnCancel")
         self.horizontalLayout.addWidget(self.uiBtnCancel)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.retranslateUi(comp_editor)
-        QtCore.QMetaObject.connectSlotsByName(comp_editor)
+        self.retranslateUi(popup_editor)
+        QtCore.QMetaObject.connectSlotsByName(popup_editor)
 
-    def retranslateUi(self, comp_editor):
+    def retranslateUi(self, popup_editor):
         _translate = QtCore.QCoreApplication.translate
-        comp_editor.setWindowTitle(_translate("comp_editor", "Form"))
-        self.uiBtnOk.setText(_translate("comp_editor", "Ok"))
-        self.uiBtnCancel.setText(_translate("comp_editor", "Cancel"))
+        popup_editor.setWindowTitle(_translate("popup_editor", "Form"))
+        self.uiBtnOk.setText(_translate("popup_editor", "Ok"))
+        self.uiBtnCancel.setText(_translate("popup_editor", "Cancel"))

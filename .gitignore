@@ -44,3 +44,13 @@ tests/test_models/__pycache__/
 __pycache__/
 
 core/components/__init__.py
+
+windows/pages/__init__.py
+
+windows/pages/comp_page/__init__.py
+
+.qt_for_python/
+
+windows/pages/comp_page/comp_editor/__init__.py
+
+windows/pages/comp_page/popup_editor/__init__.py
