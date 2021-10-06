@@ -58,8 +58,14 @@ class CompPage(PageTemplate, ui):
 
         if not self.comp_index.isValid(): return
 
-        self.popup_editor = PopupEditor()
+        action = self.sender()
+        type_string = action.data()
+        self.popup_editor = PopupEditor(type_string)
         self.popup_editor.submit.connect(self._add_node)
+
+        component = self.comp_index.internalPointer()
+        self.new_component_tag = component.increment(1)
+        tag_string = self.new_component_tag.get_tag_string()
 
     def _add_node(self, data):
         """Adds the passed data to the model."""
@@ -67,7 +73,7 @@ class CompPage(PageTemplate, ui):
         if not self.comp_model: return
 
         current_comp = self.comp_index.internalPointer()
-        self.comp_model.insertRows(data, self.comp_index)
+        self.comp_model.insertRows(data, self.new_component_tag, self.comp_index)
 
     def _remove_node(self):
         """Removes the currently selected index from the model."""
@@ -81,9 +87,32 @@ class CompPage(PageTemplate, ui):
     def _create_actions(self):
         """Creates all of the actions usable in this page."""
 
-        self.actAddComponent = qtw.QAction('Add Component')
-        self.actAddComponent.triggered.connect(self._open_editor)
-        self.actions.append(self.actAddComponent)
+        self.menuAddComponent = qtw.QMenu('Add Component')
+        self.actions.append(self.menuAddComponent.menuAction())
+
+        # --- ADD COMPONENT SUB-ACTIONS ---
+
+        self.actAssembly = qtw.QAction('Assembly')
+        self.actAssembly.triggered.connect(self._open_editor)
+        self.actAssembly.setData('assembly')
+        self.menuAddComponent.addAction(self.actAssembly)
+
+        self.actPart = qtw.QAction('Part')
+        self.actPart.triggered.connect(self._open_editor)
+        self.actPart.setData('part')
+        self.menuAddComponent.addAction(self.actPart)
+
+        self.actJig = qtw.QAction('Jig')
+        self.actJig.triggered.connect(self._open_editor)
+        self.actJig.setData('jig')
+        self.menuAddComponent.addAction(self.actJig)
+
+        self.actPlaceholder = qtw.QAction('Placeholder')
+        self.actPlaceholder.triggered.connect(self._open_editor)
+        self.actPlaceholder.setData('placeholder')
+        self.menuAddComponent.addAction(self.actPlaceholder)
+
+        #--------------------------------------------------------------
 
         self.actRemoveComponent = qtw.QAction('Remove Component')
         self.actRemoveComponent.triggered.connect(self._remove_node)

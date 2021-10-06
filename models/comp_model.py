@@ -2,8 +2,10 @@
 from PyQt5 import QtCore as qtc
 from typing import Any, Optional, Dict, List
 # --- CUSTOM MODULES ---
-from core.components.components import Component
+from core.components import components as comp
 from core.components.nodes import Node
+from core.enums import TypeEnums, StatusEnums, ManufactureEnums
+from core.components.components_factory import create_component, init_model_root
 
 class CompModel(qtc.QAbstractItemModel):
     """
@@ -11,26 +13,15 @@ class CompModel(qtc.QAbstractItemModel):
     of an assembly project.
     """
 
-    def __init__(self, root: Optional[Component] = None) -> None:
+    def __init__(self) -> None:
         """Initialise the object parameters."""
 
         super(CompModel, self).__init__()
 
-        self._init_base_components(root)
+        self.root, self.first = init_model_root()
         self._retrieve_headers()
 
 # --- INIT CUSTOM FUNCTIONS ---
-
-    def _init_base_components(self, root: Optional[Component]) -> None:
-        """Generates the initial components of the model."""
-
-        if root:
-            self.root = root
-        else:
-            self.root = Component(name='root', desc='no description')
-
-        self.first = Component(name='Project', desc='Top level node, describe the project here!')
-        self.root.add_child(self.first)
 
     def _retrieve_headers(self) -> None:
         """Extracts the headers from the root component after it is created."""
@@ -162,7 +153,7 @@ class CompModel(qtc.QAbstractItemModel):
 
         return len(self.HEADERS)
 
-    def insertRows(self, data_dict, parent_index = qtc.QModelIndex()):
+    def insertRows(self, data_dict, tag, parent_index = qtc.QModelIndex()):
         """
         Insert a node row in the specified position.
         """
@@ -176,7 +167,7 @@ class CompModel(qtc.QAbstractItemModel):
 
         self.beginInsertRows(parent_index.siblingAtColumn(0), position, position)
 
-        component = self._data_to_component(data_dict)
+        component = self._data_to_component(data_dict, tag)
         success = parent_component.add_child(component)
 
         self.endInsertRows()
@@ -204,12 +195,10 @@ class CompModel(qtc.QAbstractItemModel):
 
 # --- CUSTOM FUNCTIONS ---
 
-    def _data_to_component(self, data_dict: Dict[str, Any]) -> Component:
+    def _data_to_component(self, data_dict: Dict[str, Any], tag) -> comp.BaseComponent:
         """Converts a data dictionary to a Component instance."""
 
-        return Component(**data_dict)
+        component = create_component(data_dict)
 
-    def get_components_list(self) -> List[Node]:
-        """Returns the list of components inside the model."""
-
-        return self.root.get_subtree_components()
+        component.replace_tag(tag)
+        return component

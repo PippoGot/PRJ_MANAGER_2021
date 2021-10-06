@@ -19,7 +19,10 @@ class Node:
         Returns True if the operation succeeds.
         """
 
-        if not type(child).__name__ == type(self).__name__:
+        if self.is_leaf():
+            raise LeafNodeError(self)
+
+        if not isinstance(child, Node):
             raise InvalidTypeError(self, child)
 
         self.children_list.append(child)
@@ -34,7 +37,7 @@ class Node:
         InvalidChildError is raised. Returns True if the operation succeeds.
         """
 
-        if not type(child).__name__ == type(self).__name__:
+        if not isinstance(child, Node):
             raise InvalidTypeError(self, child)
 
         if child not in self.children_list:
@@ -47,6 +50,9 @@ class Node:
     def remove_child_at(self, position: int) -> bool:
         """Removes the child node at the specified index if possible."""
 
+        if self.is_empty():
+            raise EmptyNodeError(self)
+
         if not 0 <= position < len(self.children_list):
             raise InvalidChildIndexError(position)
 
@@ -56,6 +62,9 @@ class Node:
 
     def _set_parent(self, parent: Optional["Node"]) -> None:
         """Sets the parent field of this node."""
+
+        if self.is_root():
+            raise RootNodeError(self)
 
         self.parent = parent
 
@@ -137,6 +146,23 @@ class Node:
 
         return not len(self)
 
+    def is_root(self) -> bool:
+        """
+        Checks if the node is a root. Overwrite this method to
+        make this node behave like an absolute root node and prevent
+        it from changing it's parent node.
+        """
+
+        return False
+
+    def is_leaf(self) -> bool:
+        """
+        Checks if the node is a leaf. Overwrite this method to
+        make this node behave like a leaf node and prevent it from having children.
+        """
+
+        return False
+
 # --- DUNDERS ---
 
     def __len__(self) -> int:
@@ -159,7 +185,7 @@ class InvalidChildIndexError(Exception):
 
     def __init__(self, position: int) -> None:
         self.position = position
-        self.message = f'{type(self).__name__}: position {self.position} out of bound'
+        self.message = f'{type(self).__name__}: position {self.position} out of bound.'
 
         super().__init__(self.message)
 
@@ -171,18 +197,18 @@ class InvalidChildError(Exception):
 
     def __init__(self, child: Node) -> None:
         self.child = child
-        self.message = f'{type(self).__name__}: "{self.child}" is not in the children list'
+        self.message = f'{type(self).__name__}: "{self.child}" is not in the children list.'
 
         super().__init__(self.message)
 
 class InvalidTypeError(Exception):
-    """Reports that the passed argument is not an instance of Component."""
+    """Reports that the passed argument is not an instance of Node."""
 
-    def __init__(self, right: Any, wrong: Any) -> None:
+    def __init__(self, right: Node, wrong: Any) -> None:
         self.right = right
         self.wrong = wrong
         right_class = type(self.right).__name__
-        self.message = f'{type(self).__name__}: "{self.wrong}" is not an instance of {right_class} class'
+        self.message = f'{type(self).__name__}: "{self.wrong}" is not an instance of {right_class} class.'
 
         super().__init__(self.message)
 
@@ -191,6 +217,24 @@ class EmptyNodeError(Exception):
 
     def __init__(self, node: Node) -> None:
         self.node = node
-        self.message = f'{type(self).__name__}: "{self.node}" is empty'
+        self.message = f'{type(self).__name__}: "{self.node}" is empty.'
+
+        super().__init__(self.message)
+
+class RootNodeError(Exception):
+    """Reports that the node's parent can't be edited."""
+
+    def __init__(self, node: Node) -> None:
+        self.node = node
+        self.message = f'{type(self).__name__}: "{self.node}" can\'t have a parent.'
+
+        super().__init__(self.message)
+
+class LeafNodeError(Exception):
+    """Reports that the parent node can't be edited."""
+
+    def __init__(self, node: Node) -> None:
+        self.node = node
+        self.message = f'{type(self).__name__}: "{self.node}" can\'t have children.'
 
         super().__init__(self.message)

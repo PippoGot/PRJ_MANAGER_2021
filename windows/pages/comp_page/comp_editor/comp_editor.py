@@ -20,19 +20,35 @@ class CompEditor(qtw.QWidget, ui):
 # --- MODELS MANAGEMENT ---
 
     def set_model(self, model = None):
-        """Sets the editor model and initialize the mapper."""
+        """Sets the editor model."""
 
         self.model = model
         self.current_index = qtc.QModelIndex()
 
-
         if self.model:
-            self.mapper.setModel(self.model)
+            self._map_editor_widgets()
 
-            self.mapper.addMapping(self.uiNameEdit, 0)
-            self.mapper.addMapping(self.uiDescEdit, 1)
+    def _map_editor_widgets(self):
+        """Initialize and connects the mapper to the widgets."""
 
-            self.model.dataChanged.connect(self.mapper.revert)
+        self.mapper.setModel(self.model)
+
+        # general component info
+        self.mapper.addMapping(self.uiNameEdit, 0)
+        self.mapper.addMapping(self.uiDescEdit, 1)
+        self.mapper.addMapping(self.uiCommentEdit, 2)
+        self.mapper.addMapping(self.uiTypeDisplay, 3)
+        self.mapper.addMapping(self.uiStatusDisplay, 4)
+        self.mapper.addMapping(self.uiStatusEdit, 4)
+        self.mapper.addMapping(self.uiManufactureDisplay, 5)
+        self.mapper.addMapping(self.uiManufactureEdit, 5)
+        self.mapper.addMapping(self.uiQtyEdit, 6)
+        self.mapper.addMapping(self.uiCostEdit, 7)
+
+        # purchasable component info
+        self.mapper.addMapping(self.uiQtyPkgDisplay, 8)
+        self.mapper.addMapping(self.uiSellerDisplay, 9)
+        self.mapper.addMapping(self.uiLinkDisplay, 10)
 
     def update_current_index(self, new_index):
         """The new index is set as the current index of the editor."""

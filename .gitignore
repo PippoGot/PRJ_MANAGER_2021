@@ -54,3 +54,7 @@ windows/pages/comp_page/__init__.py
 windows/pages/comp_page/comp_editor/__init__.py
 
 windows/pages/comp_page/popup_editor/__init__.py
+
+windows/widgets/__init__.py
+
+windows/widgets/switchable_combobox/__init__.py

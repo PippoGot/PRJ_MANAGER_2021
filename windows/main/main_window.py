@@ -3,11 +3,8 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtGui as qtg
 from PyQt5 import QtCore as qtc
 # --- CUSTOM MODULES ---
-# widgets
 from ..pages.comp_page.comp_page import CompPage
-# models
 from models.comp_model import CompModel
-# UI
 from .ui_main_window import Ui_MainWindow as ui
 
 # --- CLASS ---
@@ -16,15 +13,15 @@ class MainWindow(qtw.QMainWindow, ui):
     def __init__(self, application):
         """Loads the UI window and creates the component model."""
 
-    # ui setup
+        # ui setup
         super(MainWindow, self).__init__()
         self.setupUi(self)
         self.application = application
 
-    # model creation
+        # model creation
         self._generate_models()
 
-    # page creation
+        # page creation
         self._generate_pages()
 
     def _generate_models(self):

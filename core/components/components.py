@@ -1,80 +1,135 @@
  # --- LIBRARIES ---
 from dataclasses import dataclass
-import dataclasses
-from typing import Tuple, Any, List
+from typing import Tuple, Any, List, Dict
 # --- CUSTOM MODULES ---
 from .nodes import Node
+from .info_containers import GeneralComponentInfo, PurchasableComponentInfo
+from .tag import Tag
+from ..enums import StatusEnums, TypeEnums, ManufactureEnums
+
+# --- BASE COMPONENT ---
 
 @dataclass
-class Component(Node):
+class BaseComponent(Node, GeneralComponentInfo, Tag):
+    """This class packs all of the data for a component in an assembly build."""
+
+# --- MISC COMPONENTS ---
+
+class ProjectComponent(BaseComponent):
     """
-    This class packs all of the data for a component in an assembly build.
-    Also it provides some method for the representation of the component.
+    This class will contains all of the other components, the
+    project you are building.
     """
 
-    name: str
-    desc: str
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    # HEADERS = [
-    # #     'ID',
-    # #     'type',
-    # #     'manufacture',
-    # #     'status',
-    # #     'comment',
-    # #     'price',
-    # #     'quantity',
-    # #     'packageQuantity',
-    # #     'seller',
-    # #     'link',
-    # ]
+        self.replace_field('tp', TypeEnums.PROJECT)
+        self.replace_field('manufacture', ManufactureEnums.ASSEMBLED)
 
-    # --- MODIFIERS ---
+class AssemblyComponent(BaseComponent):
+    """
+    This class represents a general assembly component, several
+    components connected together.
+    """
 
-    def replace_field(self, field: str, new_value: Any) -> None:
-        """Replaces the value of a field inside the component with a new value."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        if field not in self.get_fields_tuple():
-            raise FieldNameError(field, self)
+        self.replace_field('tp', TypeEnums.ASSEMBLY)
+        self.replace_field('manufacture', ManufactureEnums.ASSEMBLED)
 
-        setattr(self, field, new_value)
+class JigComponent(BaseComponent):
+    """This class represents a jig or a jig assembly."""
 
-    # --- GETTERS ---
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def get_subtree_components(self) -> List[Node]:
-        """Overwrites the name of the superclass method to make more sense."""
+        self.replace_field('tp', TypeEnums.JIG)
 
-        return super().get_subtree_nodes()
+class PartComponent(BaseComponent):
+    """
+    This class reimplements is_leaf to return true meaning this node can't have
+    children. Represents a part made of single component in opposition to the assembly.
+    """
 
-    def get_fields_tuple(self) -> Tuple[str]:
-        """Returns a tuple containing all of the fields in the component."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        field_list = [field.name for field in dataclasses.fields(self)]
-        return tuple(field_list)
+        self.replace_field('tp', TypeEnums.PART)
 
-    def get_field(self, field: str) -> Any:
-        """
-        Returns the value of the selected field. If a nonexistent field is
-        passed, FieldNameError is raised.
-        """
+    def is_leaf(self):
+        return True
 
-        if field not in self.get_fields_tuple():
-            raise FieldNameError(field, self)
+# --- HARDWARE COMPONENTS ---
 
-        return getattr(self, field)
+class PlaceholderComponent(PartComponent):
+    """
+    This class represents a blank spot to replace with a component
+    in the near future.
+    """
 
-    def as_dict(self):
-        """Returns this class in dict form, field_name: field_value."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        return dataclasses.asdict(self)
+        self.replace_field('tp', TypeEnums.PLACEHOLDER)
+        self.replace_field('manufacture', ManufactureEnums.ANY)
+        self.replace_field('status', StatusEnums.INVISIBLE)
+        self.replace_field('cost', 0.0)
 
-# --- CUSTOM EXCEPTIONS ---
+class HardwareComponent(PartComponent, PurchasableComponentInfo):
+    """
+    This class represents a hardware component, like something you buy
+    at the store or online and doesn't need to be processed.
+    """
 
-class FieldNameError(Exception):
-    """Reports that a passed field name does not exist in the component."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def __init__(self, field: str, component: Component) -> None:
-        self.wrong_field = field
-        self.component = component
-        self.message = f'{type(self).__name__}: {self.wrong_field} doesn\'t exist in component {self.component}'
+        self.replace_field('manufacture', ManufactureEnums.BOUGHT)
 
-        super().__init__(self.message)
+    # def get_fields_tuple(self):
+    #     general_info_fields_list = list(PartComponent.get_fields_tuple(self))
+    #     purchasable_info_fields_list = list(PurchasableComponentInfo.get_fields_tuple(self))
+
+    #     return tuple(general_info_fields_list + purchasable_info_fields_list)
+
+class MechanicalComponent(HardwareComponent):
+    """This class represents mechanical hardware, for example screws or washers."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.replace_field('tp', TypeEnums.MECHANICAL)
+
+class ElectronicComponent(HardwareComponent):
+    """This class represents electronic hardware, for example cbles or boards."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.replace_field('tp', TypeEnums.ELECTRONIC)
+
+class ElectromechanicalComponent(HardwareComponent):
+    """This class represents electromechanical hardware, for example motors or servos."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.replace_field('tp', TypeEnums.ELECTROMECHANICAL)
+
+class ConsumableComponent(HardwareComponent):
+    """This class represents consumable items, for example glues or filament spools."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.replace_field('tp', TypeEnums.CONSUMABLE)
+
+class MeasuredComponent(HardwareComponent):
+    """This class represents mechanical hardware with a measure of length or surface."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.replace_field('tp', TypeEnums.MEASURED)

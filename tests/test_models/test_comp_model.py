@@ -5,7 +5,7 @@ from unittest import TestCase
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtGui as qtg
 # --- CUSTOM MODULES ---
-from core.components.components import Component
+from core.components.components import BaseComponent
 from models.comp_model import CompModel
 from ..test_core.test_components import component_st
 
@@ -24,7 +24,7 @@ class CompModelTest(RuleBasedStateMachine):
 
         self._update_components()
 
-    def _create_index(self, component: Component) -> qtc.QModelIndex:
+    def _create_index(self, component: BaseComponent) -> qtc.QModelIndex:
         """Generates the model index of a given component."""
 
         row = component.get_row()
